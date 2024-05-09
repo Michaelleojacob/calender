@@ -1,24 +1,24 @@
-// utils/mongodb.js
 import { MongoClient } from "mongodb";
 
-// MongoDB connection URI
-const MONGODB_URI =
-  process.env.MONGODB_URI || "mongodb://localhost:27017/my_database";
+// Replace with your MongoDB Atlas connection string
+const MONGODB_URI = process.env.MONGODB_URI;
 
-// Global MongoClient variable to persist across hot reloads in Next.js
-let client;
-let clientPromise;
-
-if (!process.env.MONGODB_URI) {
+// Check if the environment variable for the MongoDB URI is set
+if (!MONGODB_URI) {
   throw new Error("Please add your MongoDB URI to your .env.local file");
 }
+
+// Global MongoClient variable to persist across hot reloads in Next.js
+let client: MongoClient | undefined;
+let clientPromise: Promise<MongoClient> | undefined;
 
 if (!clientPromise) {
   // Create a new MongoDB client if not already created
   client = new MongoClient(MONGODB_URI);
   clientPromise = client.connect();
-} else {
-  clientPromise = clientPromise;
 }
+
+// Ensure that the promise is always initialized to avoid undefined cases
+clientPromise = clientPromise ?? Promise.resolve(client);
 
 export default clientPromise;
